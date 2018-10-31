@@ -23,10 +23,20 @@ from io import StringIO
 from matplotlib import pyplot as plt
 from PIL import Image
 
+###################### ATENCIÓN ##########################
+# La sentencia (1) produce error si object_detection.py no se encuentra en la capeta <instalación_tensorflow>/model/research/object_detection
+# El problema está relacionado con PYTHONPATH porque aunque se agrega esta carpeta, python devuelve que no existe el modulo object_detection
+# Por el momento se arreglo cambiando el working directory a la carpeta mencionada:
+wd_old = os.getcwd()
+print(os.getcwd())
+os.chdir("/home/franco/Documents/detecImage/tensorflow/models/research/object_detection/")
+print(os.getcwd())
 # This is needed since the notebook is stored in the object_detection folder.
 sys.path.append("..")
-from object_detection.utils import ops as utils_ops
+from object_detection.utils import ops as utils_ops # (1)
 
+os.chdir(wd_old)
+print(os.getcwd())
 
 if StrictVersion(tf.__version__) < StrictVersion('1.9.0'):
   raise ImportError('Please upgrade your TensorFlow installation to v1.9.* or later!')
@@ -161,8 +171,11 @@ def load_image_into_numpy_array(image):
 # In[10]:
 
 # If you want to test the code with your images, just add path to the images to the TEST_IMAGE_PATHS.
-PATH_TO_TEST_IMAGES_DIR = 'test_images'
-TEST_IMAGE_PATHS = [ os.path.join(PATH_TO_TEST_IMAGES_DIR, 'image{}.jpg'.format(i)) for i in range(7, 11) ]
+PATH_TO_TEST_IMAGES_DIR = 'images'
+#TEST_IMAGE_PATHS = [ os.path.join(PATH_TO_TEST_IMAGES_DIR, 'image{}.jpg'.format(i)) for i in range(1, 3) ]
+
+TEST_IMAGE_PATHS = [ os.path.join(PATH_TO_TEST_IMAGES_DIR,  '{}'.format(filename)) for filename in os.listdir( './' + PATH_TO_TEST_IMAGES_DIR) ]
+
 
 # Size, in inches, of the output images.
 IMAGE_SIZE = (18, 12)
@@ -246,8 +259,12 @@ for image_path in TEST_IMAGE_PATHS:
       use_normalized_coordinates=True,
       line_thickness=8)
   #plt.figure(figsize=IMAGE_SIZE)
+  
+  
   plt.figure()
   plt.imshow(image_np)
   plt.savefig(image_path[:-4] + '_resultado ' + '.jpg' )
+  
+  
   print('Imagen procesada: ' + image_path)
 
