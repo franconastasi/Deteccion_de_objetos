@@ -28,15 +28,15 @@ from PIL import Image
 # El problema está relacionado con PYTHONPATH porque aunque se agrega esta carpeta, python devuelve que no existe el modulo object_detection
 # Por el momento se arreglo cambiando el working directory a la carpeta mencionada:
 wd_old = os.getcwd()
-print(os.getcwd())
+
 os.chdir("/home/franco/Documents/detecImage/tensorflow/models/research/object_detection/")
-print(os.getcwd())
+
 # This is needed since the notebook is stored in the object_detection folder.
 sys.path.append("..")
 from object_detection.utils import ops as utils_ops # (1)
 
 os.chdir(wd_old)
-print(os.getcwd())
+
 
 if StrictVersion(tf.__version__) < StrictVersion('1.9.0'):
   raise ImportError('Please upgrade your TensorFlow installation to v1.9.* or later!')
@@ -151,7 +151,7 @@ with detection_graph.as_default():
 
 # In[15]:
 
-
+#diccionario con los labels que se encuentran en PATH_TO_LABEÑLS
 category_index = label_map_util.create_category_index_from_labelmap(PATH_TO_LABELS, use_display_name=True)
 
 
@@ -244,7 +244,11 @@ for image_path in TEST_IMAGE_PATHS:
   image_np_expanded = np.expand_dims(image_np, axis=0)
   # Actual detection.
   output_dict = run_inference_for_single_image(image_np, detection_graph)
+  
+  
   # Visualization of the results of a detection.
+  
+  
   vis_util.visualize_boxes_and_labels_on_image_array(
       image_np,
       output_dict['detection_boxes'],
@@ -258,13 +262,44 @@ for image_path in TEST_IMAGE_PATHS:
       instance_masks=output_dict.get('detection_masks'),
       use_normalized_coordinates=True,
       line_thickness=8)
+  
   #plt.figure(figsize=IMAGE_SIZE)
-  
-  
   plt.figure()
   plt.imshow(image_np)
   plt.savefig(image_path[:-4] + '_resultado ' + '.jpg' )
   
   
+  
+  
   print('Imagen procesada: ' + image_path)
-
+  for index, obj in enumerate(output_dict['detection_classes']):
+    if output_dict['detection_scores'][index] < 0.2:
+        continue
+    else:
+        print("objeto detectado: "+ category_index[obj]['name'] + " con probabilidad %4.2f " % (output_dict['detection_scores'][index]*100) )
+  
+  print("")
+# In[]  
+  
+    """    
+  print(category_index)
+  print(type(category_index))
+  
+  print(output_dict['detection_classes'])
+  print(type(output_dict['detection_classes']))
+  
+  print(output_dict['detection_scores'])
+  print(type(output_dict['detection_scores']))
+  
+  output_dict['detection_scores'].size
+      """
+  
+# In[]
+  
+print('')
+        
+for index, obj in enumerate(output_dict['detection_classes']):
+    if output_dict['detection_scores'][index] < 0.2:
+        continue
+    else:
+        print("objeto detectado: "+ category_index[obj]['name'] + " con probabilidad %4.2f " % (output_dict['detection_scores'][index]*100) )
